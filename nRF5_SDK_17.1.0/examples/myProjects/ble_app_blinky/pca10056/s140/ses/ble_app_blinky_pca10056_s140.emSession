@@ -1,0 +1,49 @@
+<!DOCTYPE CrossStudio_Session_File>
+<session>
+ <Bookmarks/>
+ <Breakpoints groups="Breakpoints" active_group="Breakpoints"/>
+ <ExecutionProfileWindow/>
+ <FrameBufferWindow>
+  <FrameBufferWindow bufferHeight="-1" addressSpace="" addressText="" bufferWidth="-1"/>
+ </FrameBufferWindow>
+ <Memory1/>
+ <Memory2/>
+ <Memory3/>
+ <Memory4/>
+ <Project>
+  <ProjectSessionItem path="ble_app_blinky_pca10056_s140"/>
+  <ProjectSessionItem path="ble_app_blinky_pca10056_s140;ble_app_blinky_pca10056_s140"/>
+  <ProjectSessionItem path="ble_app_blinky_pca10056_s140;ble_app_blinky_pca10056_s140;Application"/>
+  <ProjectSessionItem path="ble_app_blinky_pca10056_s140;ble_app_blinky_pca10056_s140;nRF_Segger_RTT"/>
+ </Project>
+ <Register1/>
+ <Register2/>
+ <Register3/>
+ <Register4/>
+ <Threads>
+  <ThreadsWindow showLists=""/>
+ </Threads>
+ <TraceWindow>
+  <Trace enabled="Yes"/>
+ </TraceWindow>
+ <Watch1>
+  <Watches active="1" update="Never"/>
+ </Watch1>
+ <Watch2>
+  <Watches active="0" update="Never"/>
+ </Watch2>
+ <Watch3>
+  <Watches active="0" update="Never"/>
+ </Watch3>
+ <Watch4>
+  <Watches active="0" update="Never"/>
+ </Watch4>
+ <Files>
+  <SessionOpenFile windowGroup="DockEditLeft" x="46" y="108" useTextEdit="1" path="../../../main.c" left="0" selected="1" top="97" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="6" y="48" useTextEdit="1" path="../../../../../../components/libraries/util/sdk_resources.h" left="0" top="42" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" openedFrom="C:/Users/bpart/Desktop/Drive/Engineering/BLE/nRF5_SDK_17.1.0_wSD7.3/examples/myProjects/ble_app_blinky/main.c" path="../../../../../../components/ble/ble_services/ble_lbs/ble_lbs.h" left="0" top="106" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="21" y="208" useTextEdit="1" openedFrom="C:/Users/bpart/Desktop/Drive/Engineering/BLE/nRF5_SDK_17.1.0_wSD7.3/examples/myProjects/ble_app_blinky/main.c" path="../../../../../../components/boards/boards.h" left="0" top="196" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="24" y="80" useTextEdit="1" openedFrom="C:/Users/bpart/Desktop/Drive/Engineering/BLE/nRF5_SDK_17.1.0_wSD7.3/components/boards/boards.h" path="../../../../../../modules/nrfx/hal/nrf_gpio.h" left="0" top="69" codecName="Default"/>
+ </Files>
+ <EMStudioWindow activeProject="ble_app_blinky_pca10056_s140" fileDialogDefaultFilter="*.c" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="" debugSearchPath="" autoConnectCapabilities="3199"/>
+</session>
