@@ -14,6 +14,7 @@
 ********************************************************************************/
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
 #include "ir_send.h"
 #include "nrf_drv_pwm.h"
 #include "nrf_gpio.h"
@@ -188,6 +189,6 @@ static void AddSpace(uint8_t numSpaces)
     TotalCycleCount += (SONY_CYCLES_PER_UNIT*numSpaces);
     if(TotalCycleCount < MAX_CYCLES_PER_CODE)
     {
-        memset(seq0_values[TotalCycleCount], SPACE_DUTY_CYCLE, SONY_CYCLES_PER_UNIT*numSpaces);
+        memset(&seq0_values[TotalCycleCount], SPACE_DUTY_CYCLE, SONY_CYCLES_PER_UNIT*numSpaces);
     }
 }
