@@ -14,7 +14,7 @@
   <ProjectSessionItem path="ir_tv_remote_s140"/>
   <ProjectSessionItem path="ir_tv_remote_s140;ir_tv_remote_s140"/>
   <ProjectSessionItem path="ir_tv_remote_s140;ir_tv_remote_s140;Application"/>
-  <ProjectSessionItem path="ir_tv_remote_s140;ir_tv_remote_s140;nRF_Segger_RTT"/>
+  <ProjectSessionItem path="ir_tv_remote_s140;ir_tv_remote_s140;utilities"/>
  </Project>
  <Register1/>
  <Register2/>
@@ -38,6 +38,10 @@
  <Watch4>
   <Watches active="0" update="Never"/>
  </Watch4>
- <Files/>
- <EMStudioWindow activeProject="ir_tv_remote_s140" fileDialogDefaultFilter="*.c" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="" debugSearchPath="" autoConnectCapabilities="3199"/>
+ <Files>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="116" useTextEdit="1" path="../src/utilites/circular_buffer.c" left="0" top="104" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="13" y="60" useTextEdit="1" path="../src/utilites/circular_buffer.h" left="0" top="48" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="28" y="71" useTextEdit="1" path="../src/main/main.c" left="0" selected="1" top="61" codecName="Default"/>
+ </Files>
+ <EMStudioWindow activeProject="ir_tv_remote_s140" fileDialogDefaultFilter="*.c;*.h" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="C:/Users/bpart/Desktop/Drive/Engineering/BLE/GitHubProjects/BleIrRemote/ir_tv_remote/src/utilites" debugSearchPath="" autoConnectCapabilities="3199"/>
 </session>

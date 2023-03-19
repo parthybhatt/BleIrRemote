@@ -69,6 +69,7 @@
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
 
+#include "utilites/circular_buffer.h"
 
 #define ADVERTISING_LED                 BSP_BOARD_LED_0                         /**< Is on when device is advertising. */
 #define CONNECTED_LED                   BSP_BOARD_LED_1                         /**< Is on when device has connected. */
@@ -97,6 +98,8 @@
 
 #define IR_LED                          NRF_GPIO_PIN_MAP(0,3)
 
+#define IR_CMDS_BUFFER_SIZE             (20)
+
 BLE_TRS_DEF(m_trs);
 NRF_BLE_GATT_DEF(m_gatt);                                                       /**< GATT module instance. */
 NRF_BLE_QWR_DEF(m_qwr);                                                         /**< Context for the Queued Write module.*/
@@ -106,6 +109,9 @@ static uint16_t m_conn_handle = BLE_CONN_HANDLE_INVALID;                        
 static uint8_t m_adv_handle = BLE_GAP_ADV_SET_HANDLE_NOT_SET;                   /**< Advertising handle used to identify an advertising set. */
 static uint8_t m_enc_advdata[BLE_GAP_ADV_SET_DATA_SIZE_MAX];                    /**< Buffer for storing an encoded advertising set. */
 static uint8_t m_enc_scan_response_data[BLE_GAP_ADV_SET_DATA_SIZE_MAX];         /**< Buffer for storing an encoded scan data. */
+
+static CircularBufferStruct_t circular_buffer_ir_cmds;
+static uint16_t ir_cmds_buffer[IR_CMDS_BUFFER_SIZE];
 
 /**@brief Struct that contains pointers to the encoded advertising data. */
 static ble_gap_adv_data_t m_adv_data =
@@ -270,7 +276,7 @@ static void nrf_qwr_error_handler(uint32_t nrf_error)
 static void ir_decode_handler(uint16_t conn_handle, ble_trs_t * p_trs, uint16_t ir_code)
 {
   NRF_LOG_INFO("Received code %d", ir_code);
-  IrSend_Transmit(ir_code);
+  CircularBuffer_AddElement(&circular_buffer_ir_cmds, &ir_code);
 }
 
 
@@ -497,6 +503,12 @@ static void idle_state_handle(void)
     {
         nrf_pwr_mgmt_run();
     }
+    if(CircularBuffer_GetBufferState(&circular_buffer_ir_cmds) == BUFFER_STATE_HAS_ELEMENTS)
+    {
+        uint16_t ir_cmd = 0;
+        CircularBuffer_GetLastElement(&circular_buffer_ir_cmds, &ir_cmd);
+        IrSend_Transmit(ir_cmd);
+    }
 }
 
 
@@ -506,6 +518,7 @@ int main(void)
 {
     // Initialize.
     log_init();
+    CircularBuffer_Init(&circular_buffer_ir_cmds,&ir_cmds_buffer, IR_CMDS_BUFFER_SIZE, sizeof(uint16_t), false);
     IrSend_Init(IR_LED);
     leds_init();
     timers_init();
