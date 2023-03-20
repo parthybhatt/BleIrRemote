@@ -121,6 +121,10 @@
       <file file_name="../src/ir_send/ir_send.c" />
       <file file_name="../src/ir_send/ir_send.h" />
     </folder>
+    <folder Name="utilities">
+      <file file_name="../src/utilites/circular_buffer.c" />
+      <file file_name="../src/utilites/circular_buffer.h" />
+    </folder>
   </project>
   <configuration
     Name="Release"
