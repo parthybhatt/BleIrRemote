@@ -10,6 +10,8 @@ Hardware required:
     - [Documentation link](https://wiki.seeedstudio.com/XIAO_BLE/)
 
 Softwares required:
-- Segger Embedded Studio V6.30
-- python 3.8.10
+- [Segger Embedded Studio V6.30](https://www.segger.com/downloads/embedded-studio/)
+- [python 3.8.10](https://www.python.org/downloads/release/python-3810/)
 - [adafruit-nrfutil](https://github.com/adafruit/Adafruit_nRF52_nrfutil)
+- [Visual Studio 2022](https://visualstudio.microsoft.com/downloads/)
+- [Visual Studio package Plugin.BLE v2.1.3](https://www.nuget.org/packages/Plugin.BLE/#supportedframeworks-body-tab)
