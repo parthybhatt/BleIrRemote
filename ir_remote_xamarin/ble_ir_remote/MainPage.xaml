@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ble_ir_remote.MainPage">
+
+    <StackLayout>
+        <Button x:Name="Connection_Button" Text="Connect Device" Clicked="OpenDeviceList"/>
+        <ListView x:Name="Devices_ListView" ItemSelected="Devices_ListView_ItemSelected" IsVisible="false">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                        <ViewCell.View>
+                            <Label Text="{Binding Name}" />
+                        </ViewCell.View>
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <Button Text="0/I" Clicked="Button_Clicked" AutomationId="Power"/>
+        <Button Text="+" Clicked="Button_Clicked" AutomationId="VolUp"/>
+        <Button Text="-" Clicked="Button_Clicked" AutomationId="VolDn"/>
+        <Button Text="Mute" Clicked="Button_Clicked" AutomationId="Mute"/>
+    </StackLayout>
+
+</ContentPage>
