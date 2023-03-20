@@ -1,4 +1,6 @@
 @echo off
+set "batch_path=%~dp0"
+set "hex_relative_path=Output\Debug\Exe\"
 set "op_package_file=%batch_path%%hex_relative_path%dfu_package.zip"
 set "nrfutil_file=C:\Users\bpart\AppData\Roaming\Python\Python38\Scripts\adafruit-nrfutil.exe"
 
@@ -15,10 +17,10 @@ if %errorlevel% equ 0 (
     echo The COM port %com_port% is available.
 
     if exist "%nrfutil_file%" (
-        if exist "%hex_absolute_path%" (
+        if exist "%op_package_file%" (
             "%nrfutil_file%" --verbose dfu serial -pkg "%op_package_file%" -p COM10 -b 115200 --singlebank
         ) else (
-            echo "%hex_absolute_path%" file not found. Make sure to build the s140 project before running the script
+            echo "%op_package_file%" file not found. Make sure to build the s140 project before running the script
         )
     ) else (
         echo "adafruit-nrfutil.exe" does not exist. Please follow readme file to learn how to install the utility
