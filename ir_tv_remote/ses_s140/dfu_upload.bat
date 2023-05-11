@@ -18,7 +18,7 @@ if %errorlevel% equ 0 (
 
     if exist "%nrfutil_file%" (
         if exist "%op_package_file%" (
-            "%nrfutil_file%" --verbose dfu serial -pkg "%op_package_file%" -p COM10 -b 115200 --singlebank
+            "%nrfutil_file%" --verbose dfu serial -pkg "%op_package_file%" -p %com_port% -b 115200 --singlebank
         ) else (
             echo "%op_package_file%" file not found. Make sure to build the s140 project before running the script
         )
