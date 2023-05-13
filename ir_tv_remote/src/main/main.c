@@ -97,7 +97,7 @@
 #define DEAD_BEEF                       0xDEADBEEF                              /**< Value used as error code on stack dump, can be used to identify stack location on stack unwind. */
 
 #ifdef S140
-#define IR_LED                          NRF_GPIO_PIN_MAP(1,15)
+#define IR_LED                          NRF_GPIO_PIN_MAP(0,5)
 #elif defined(S132)
 #define IR_LED                          NRF_GPIO_PIN_MAP(0,3)
 #endif
