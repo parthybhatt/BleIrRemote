@@ -5,8 +5,15 @@ set "op_package_file=%batch_path%%hex_relative_path%dfu_package.zip"
 set "nrfutil_file=C:\Users\bpart\AppData\Roaming\Python\Python38\Scripts\adafruit-nrfutil.exe"
 
 @echo off
+echo Please note that having multple COM port devices can have unknown behaviour.
+echo Please disconnect all other COM port devices other than your BLE device.
 
-set /p com_number="Enter the COM port number: "
+for /f "tokens=2delims=COM:" %%i in ('mode^|findstr /C:"COM"')do set "com_number=%%i"
+
+if "%com_number%"=="" (
+    set /p com_number="Failed to detect COM port. Enter the COM port number: "
+)
+
 set com_port=COM%com_number%
 
 echo Checking status for %com_port%...
