@@ -86,6 +86,7 @@
       <file file_name="../../nRF5_SDK_17.1.0/modules/nrfx/drivers/src/nrfx_pwm.c" />
       <file file_name="../../nRF5_SDK_17.1.0/modules/nrfx/drivers/src/nrfx_uart.c" />
       <file file_name="../../nRF5_SDK_17.1.0/modules/nrfx/drivers/src/nrfx_uarte.c" />
+      <file file_name="../../nRF5_SDK_17.1.0/modules/nrfx/drivers/src/nrfx_saadc.c" />
     </folder>
     <folder Name="Application">
       <file file_name="../src/main/main.c" />
@@ -108,6 +109,7 @@
     </folder>
     <folder Name="nRF_BLE_Services">
       <file file_name="../../nRF5_SDK_17.1.0/components/ble/ble_services/ble_lbs/ble_lbs.c" />
+      <file file_name="../../nRF5_SDK_17.1.0/components/ble/ble_services/ble_bas/ble_bas.c" />
     </folder>
     <folder Name="nRF_SoftDevice">
       <file file_name="../../nRF5_SDK_17.1.0/components/softdevice/common/nrf_sdh.c" />
@@ -125,6 +127,10 @@
     <folder Name="utilities">
       <file file_name="../src/utilites/circular_buffer.c" />
       <file file_name="../src/utilites/circular_buffer.h" />
+    </folder>
+    <folder Name="battery_manager">
+      <file file_name="../src/battery_manager/battery_manager.c" />
+      <file file_name="../src/battery_manager/battery_manager.h" />
     </folder>
   </project>
   <configuration

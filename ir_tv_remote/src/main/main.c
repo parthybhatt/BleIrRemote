@@ -70,6 +70,7 @@
 #include "nrf_log_default_backends.h"
 
 #include "utilites/circular_buffer.h"
+#include "battery_manager/battery_manager.h"
 
 #define ADVERTISING_LED                 BSP_BOARD_LED_0                         /**< Is on when device is advertising. */
 #define CONNECTED_LED                   BSP_BOARD_LED_1                         /**< Is on when device has connected. */
@@ -101,6 +102,8 @@
 #elif defined(S132)
 #define IR_LED                          NRF_GPIO_PIN_MAP(0,3)
 #endif
+
+#define DEBUG_PIN                       NRF_GPIO_PIN_MAP(0,12)
 
 #define IR_CMDS_BUFFER_SIZE             (20)
 
@@ -503,6 +506,7 @@ static void power_management_init(void)
  */
 static void idle_state_handle(void)
 {
+    static bool sampleAdc = true;
     if (NRF_LOG_PROCESS() == false)
     {
         nrf_pwr_mgmt_run();
@@ -512,6 +516,23 @@ static void idle_state_handle(void)
         uint16_t ir_cmd = 0;
         CircularBuffer_GetLastElement(&circular_buffer_ir_cmds, &ir_cmd);
         IrSend_Transmit(ir_cmd);
+    }
+    else
+    {
+        if(sampleAdc)
+        {
+          nrf_gpio_pin_set(DEBUG_PIN);
+          //int16_t value = BatteryManager_GetLevelADCCounts();
+          BatteryManager_SampleBattery();
+          nrf_gpio_pin_clear(DEBUG_PIN);
+          sampleAdc = !sampleAdc;
+        }
+        else
+        {
+          int16_t val = BatteryManager_GetLevelADCCounts();
+          float fval = BatteryManager_GetLevelVolts();
+          sampleAdc = !sampleAdc;
+        }
     }
 }
 
@@ -524,6 +545,7 @@ int main(void)
     log_init();
     CircularBuffer_Init(&circular_buffer_ir_cmds,&ir_cmds_buffer, IR_CMDS_BUFFER_SIZE, sizeof(uint16_t), false);
     IrSend_Init(IR_LED);
+    BatteryManager_Init();
     leds_init();
     timers_init();
     power_management_init();
@@ -537,6 +559,8 @@ int main(void)
     // Start execution.
     NRF_LOG_INFO("Sony Ble Remote started.");
     advertising_start();
+
+    nrf_gpio_cfg_output(DEBUG_PIN);
 
     // Enter main loop.
     for (;;)
