@@ -33,9 +33,10 @@
 * Functions
 ********************************************************************************/
 
-void BatteryManager_Init();
+void BatteryManager_Init(float minBattLvl, float maxBattLvl);
 void BatteryManager_SampleBattery();
 float BatteryManager_GetLevelVolts();
+uint8_t BatteryManager_GetBatteryPercent();
 int16_t BatteryManager_GetLevelADCCounts();
 
 #endif

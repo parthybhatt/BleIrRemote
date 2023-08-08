@@ -64,6 +64,7 @@
 #include "nrf_pwr_mgmt.h"
 #include "tv_remote_srv/tv_remote_srv.h"
 #include "ir_send/ir_send.h"
+#include "ble_bas.h"
 
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
@@ -83,6 +84,7 @@
 #define APP_ADV_INTERVAL                64                                      /**< The advertising interval (in units of 0.625 ms; this value corresponds to 40 ms). */
 #define APP_ADV_DURATION                BLE_GAP_ADV_TIMEOUT_GENERAL_UNLIMITED   /**< The advertising time-out (in units of seconds). When set to 0, we will never time out. */
 
+#define BATTERY_LEVEL_MEAS_INTERVAL     APP_TIMER_TICKS(5000)                   /**< Battery level measurement interval (ticks). */
 
 #define MIN_CONN_INTERVAL               MSEC_TO_UNITS(100, UNIT_1_25_MS)        /**< Minimum acceptable connection interval (0.5 seconds). */
 #define MAX_CONN_INTERVAL               MSEC_TO_UNITS(200, UNIT_1_25_MS)        /**< Maximum acceptable connection interval (1 second). */
@@ -97,16 +99,19 @@
 
 #define DEAD_BEEF                       0xDEADBEEF                              /**< Value used as error code on stack dump, can be used to identify stack location on stack unwind. */
 
+#define MAX_BATTERY_VOLTAGE             (4.2f)
+#define MIN_BATTERY_VOLTAGE             (3.3f)
+
 #ifdef S140
 #define IR_LED                          NRF_GPIO_PIN_MAP(0,5)
 #elif defined(S132)
 #define IR_LED                          NRF_GPIO_PIN_MAP(0,3)
 #endif
 
-#define DEBUG_PIN                       NRF_GPIO_PIN_MAP(0,12)
-
 #define IR_CMDS_BUFFER_SIZE             (20)
 
+APP_TIMER_DEF(m_battery_timer_id);                                              /**< Battery timer. */
+BLE_BAS_DEF(m_bas);
 BLE_TRS_DEF(m_trs);
 NRF_BLE_GATT_DEF(m_gatt);                                                       /**< GATT module instance. */
 NRF_BLE_QWR_DEF(m_qwr);                                                         /**< Context for the Queued Write module.*/
@@ -162,6 +167,41 @@ static void leds_init(void)
     bsp_board_init(BSP_INIT_LEDS);
 }
 
+/**@brief Function for performing battery measurement and updating the Battery Level characteristic
+ *        in Battery Service.
+ */
+static void battery_level_update(void)
+{
+    ret_code_t err_code;
+    uint8_t  battery_level;
+
+    battery_level = BatteryManager_GetBatteryPercent();
+
+    err_code = ble_bas_battery_level_update(&m_bas, battery_level, BLE_CONN_HANDLE_ALL);
+    if ((err_code != NRF_SUCCESS) &&
+        (err_code != NRF_ERROR_INVALID_STATE) &&
+        (err_code != NRF_ERROR_RESOURCES) &&
+        (err_code != BLE_ERROR_GATTS_SYS_ATTR_MISSING)
+       )
+    {
+        APP_ERROR_HANDLER(err_code);
+    }
+    BatteryManager_SampleBattery();
+}
+
+
+/**@brief Function for handling the Battery measurement timer timeout.
+ *
+ * @details This function will be called each time the battery level measurement timer expires.
+ *
+ * @param[in]   p_context   Pointer used for passing some arbitrary information (context) from the
+ *                          app_start_timer() call to the timeout handler.
+ */
+static void battery_level_meas_timeout_handler(void * p_context)
+{
+    UNUSED_PARAMETER(p_context);
+    battery_level_update();
+}
 
 /**@brief Function for the Timer initialization.
  *
@@ -172,8 +212,22 @@ static void timers_init(void)
     // Initialize timer module, making it use the scheduler
     ret_code_t err_code = app_timer_init();
     APP_ERROR_CHECK(err_code);
+
+    // Create timers.
+    err_code = app_timer_create(&m_battery_timer_id,
+                                APP_TIMER_MODE_REPEATED,
+                                battery_level_meas_timeout_handler);
+    APP_ERROR_CHECK(err_code);
 }
 
+static void application_timers_start(void)
+{
+    ret_code_t err_code;
+
+    // Start application timers.
+    err_code = app_timer_start(m_battery_timer_id, BATTERY_LEVEL_MEAS_INTERVAL, NULL);
+    APP_ERROR_CHECK(err_code);
+}
 
 /**@brief Function for the GAP initialization.
  *
@@ -225,7 +279,10 @@ static void advertising_init(void)
     ble_advdata_t advdata;
     ble_advdata_t srdata;
 
-    ble_uuid_t adv_uuids[] = {{TRS_UUID_SERVICE, m_trs.uuid_type}};
+    ble_uuid_t adv_uuids[] = {
+                            {TRS_UUID_SERVICE,                      m_trs.uuid_type},
+                            {BLE_UUID_BATTERY_SERVICE,              BLE_UUID_TYPE_BLE},
+                            };
 
     // Build and set advertising data.
     memset(&advdata, 0, sizeof(advdata));
@@ -286,7 +343,6 @@ static void ir_decode_handler(uint16_t conn_handle, ble_trs_t * p_trs, uint16_t 
   CircularBuffer_AddElement(&circular_buffer_ir_cmds, &ir_code);
 }
 
-
 /**@brief Function for initializing services that will be used by the application.
  */
 static void services_init(void)
@@ -304,6 +360,22 @@ static void services_init(void)
     init.ir_decode_handler = ir_decode_handler;
 
     err_code = ble_trs_init(&m_trs, &init);
+    APP_ERROR_CHECK(err_code);
+
+    //Init Battery Service
+    ble_bas_init_t bas_init = {0};
+
+    // Here the sec level for the Battery Service can be changed/increased.
+    bas_init.bl_rd_sec        = SEC_OPEN;
+    bas_init.bl_cccd_wr_sec   = SEC_OPEN;
+    bas_init.bl_report_rd_sec = SEC_OPEN;
+
+    bas_init.evt_handler          = NULL;
+    bas_init.support_notification = true;
+    bas_init.p_report_ref         = NULL;
+    bas_init.initial_batt_level   = 100;
+
+    err_code = ble_bas_init(&m_bas, &bas_init);
     APP_ERROR_CHECK(err_code);
 }
 
@@ -506,7 +578,6 @@ static void power_management_init(void)
  */
 static void idle_state_handle(void)
 {
-    static bool sampleAdc = true;
     if (NRF_LOG_PROCESS() == false)
     {
         nrf_pwr_mgmt_run();
@@ -516,23 +587,6 @@ static void idle_state_handle(void)
         uint16_t ir_cmd = 0;
         CircularBuffer_GetLastElement(&circular_buffer_ir_cmds, &ir_cmd);
         IrSend_Transmit(ir_cmd);
-    }
-    else
-    {
-        if(sampleAdc)
-        {
-          nrf_gpio_pin_set(DEBUG_PIN);
-          //int16_t value = BatteryManager_GetLevelADCCounts();
-          BatteryManager_SampleBattery();
-          nrf_gpio_pin_clear(DEBUG_PIN);
-          sampleAdc = !sampleAdc;
-        }
-        else
-        {
-          int16_t val = BatteryManager_GetLevelADCCounts();
-          float fval = BatteryManager_GetLevelVolts();
-          sampleAdc = !sampleAdc;
-        }
     }
 }
 
@@ -545,7 +599,7 @@ int main(void)
     log_init();
     CircularBuffer_Init(&circular_buffer_ir_cmds,&ir_cmds_buffer, IR_CMDS_BUFFER_SIZE, sizeof(uint16_t), false);
     IrSend_Init(IR_LED);
-    BatteryManager_Init();
+    BatteryManager_Init(MIN_BATTERY_VOLTAGE, MAX_BATTERY_VOLTAGE);
     leds_init();
     timers_init();
     power_management_init();
@@ -559,8 +613,7 @@ int main(void)
     // Start execution.
     NRF_LOG_INFO("Sony Ble Remote started.");
     advertising_start();
-
-    nrf_gpio_cfg_output(DEBUG_PIN);
+    application_timers_start();
 
     // Enter main loop.
     for (;;)

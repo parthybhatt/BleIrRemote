@@ -35,6 +35,10 @@
                 (VOLTAGE_DIVIDER_RH_KOHMS + VOLTAGE_DIVIDER_RL_KOHMS) \
                                             )
 #define VREF                                (3.3f)
+#define NUM_ADC_CNTS_10BIT_RES_3V3_VBATT    (346)
+
+#define VBATT_TO_ADC_COUNTS(Vbatt)          ( (Vbatt* BATTERY_VOLTAGE_CALC_SCALE_FACTOR) / \
+                                                (VREF/MAX_SAMPLE_VAL) )
 
 /*******************************************************************************
 * Data types (Structs, enum)
@@ -45,6 +49,8 @@
 ********************************************************************************/
 static uint32_t batt_enable_pin = NRF_GPIO_PIN_MAP(0,14);
 static int16_t  last_sample_val = 0xFFFF;
+static int16_t  percent_0_adc_cnts = NUM_ADC_CNTS_10BIT_RES_3V3_VBATT;
+static int16_t  percent_100_adc_cnts = MAX_SAMPLE_VAL;
 
 /*******************************************************************************
 * Static Functions Declaration
@@ -55,8 +61,11 @@ static void AdcConversionCompleteCallback(nrfx_saadc_evt_t const * p_event);
 * Public Functions
 ********************************************************************************/
 
-void BatteryManager_Init()
+void BatteryManager_Init(float minBattLvl, float maxBattLvl)
 {
+    percent_0_adc_cnts = (int16_t) VBATT_TO_ADC_COUNTS(minBattLvl);
+    percent_100_adc_cnts = (int16_t) VBATT_TO_ADC_COUNTS(maxBattLvl);
+
     nrf_gpio_cfg_output(batt_enable_pin);
     nrf_gpio_pin_clear(batt_enable_pin);
 
@@ -105,6 +114,21 @@ float BatteryManager_GetLevelVolts()
     {
         return 0;
     }
+}
+
+uint8_t BatteryManager_GetBatteryPercent()
+{
+    uint8_t percent = 0;
+
+    if(last_sample_val < percent_0_adc_cnts)
+    {
+        percent = 128;
+    }
+    else
+    {
+        percent = ( 100 * (last_sample_val - percent_0_adc_cnts) ) / (percent_100_adc_cnts - percent_0_adc_cnts);
+    }
+    return percent;
 }
 
 int16_t BatteryManager_GetLevelADCCounts()
