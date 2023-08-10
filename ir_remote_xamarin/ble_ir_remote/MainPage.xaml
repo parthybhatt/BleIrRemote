@@ -3,23 +3,58 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="ble_ir_remote.MainPage">
 
+    <ContentPage.Resources>
+        <Style x:Key="RoundButtonStyle" TargetType="Button">
+            <Setter Property="BackgroundColor" Value="Gray" />
+            <Setter Property="CornerRadius" Value="100" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="HorizontalOptions" Value="Center" />
+            <Setter Property="VerticalOptions" Value="Center" />
+            <Setter Property="Margin" Value="15" />
+        </Style>
+    </ContentPage.Resources>
+    
     <StackLayout>
-        <Button x:Name="Connection_Button" Text="Connect Device" Clicked="OpenDeviceList"/>
-        <ListView x:Name="Devices_ListView" ItemSelected="Devices_ListView_ItemSelected" IsVisible="false">
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <ViewCell>
-                        <ViewCell.View>
-                            <Label Text="{Binding Name}" />
-                        </ViewCell.View>
-                    </ViewCell>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
-        <Button Text="0/I" Clicked="Button_Clicked" AutomationId="Power"/>
-        <Button Text="+" Clicked="Button_Clicked" AutomationId="VolUp"/>
-        <Button Text="-" Clicked="Button_Clicked" AutomationId="VolDn"/>
-        <Button Text="Mute" Clicked="Button_Clicked" AutomationId="Mute"/>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="100"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="100"/>
+                </Grid.ColumnDefinitions>
+                <Button x:Name="Connection_Button" Grid.Column="0"  Text="Connect Device" Clicked="OpenDeviceList" VerticalOptions="End"/>
+                <Label x:Name="BatteryStatus" Grid.Column="1" Text="Not Connected" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+            </Grid>
+            <ListView x:Name="Devices_ListView" Grid.Row="1" ItemSelected="Devices_ListView_ItemSelected" IsVisible="false">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <ViewCell.View>
+                                <Label Text="{Binding Name}" />
+                            </ViewCell.View>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
+        <Button Text="0/I" Clicked="Button_Clicked" AutomationId="Power" Style="{StaticResource RoundButtonStyle}"/>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Frame Grid.Column="1" CornerRadius="70" BackgroundColor="Gray" Padding="-15">
+                <StackLayout Orientation="Vertical" Spacing="0">
+                    <Button Text="+" Clicked="Button_Clicked" AutomationId="VolUp" Style="{StaticResource RoundButtonStyle}"/>
+                    <Button Text="-" Clicked="Button_Clicked" AutomationId="VolDn" Style="{StaticResource RoundButtonStyle}"/>
+                </StackLayout>
+            </Frame>
+        </Grid>
+        <Button Text="Mute" Clicked="Button_Clicked" AutomationId="Mute" Style="{StaticResource RoundButtonStyle}"/>
     </StackLayout>
 
 </ContentPage>
