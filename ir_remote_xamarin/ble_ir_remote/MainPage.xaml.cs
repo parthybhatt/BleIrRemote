@@ -32,8 +32,15 @@ namespace ble_ir_remote
 
         private void OpenDeviceList(object sender, EventArgs e)
         {
-            Devices_ListView.IsVisible = true;
-            ScanDevices();
+            if (Devices_ListView.IsVisible == false)
+            {
+                Devices_ListView.IsVisible = true;
+                ScanDevices();
+            }
+            else
+            {
+                Devices_ListView.IsVisible = false;
+            }
         }
 
         private void Devices_ListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)
